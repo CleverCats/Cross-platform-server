@@ -1,0 +1,201 @@
+#include<iostream>
+#include<vector>
+using namespace std;
+
+enum TraType{
+	Preorder,
+	Inorder,
+	Postorder,
+	Sequence
+};
+typedef struct TreeNode{
+public:
+	struct TreeNode *lchild,*rchild;
+	int						   data; 
+	TreeNode() :lchild(NULL), rchild(NULL){}
+}*BinaryNode,*BinaryRoot,Tree;
+
+
+/*-----------------
+*单例类
+*指向一颗完全二叉树的根节点
+-----------------*/
+
+class BinaryTree
+{
+public:
+	int							 Depth;
+private:
+	int							 CurDepth;
+	BinaryTree() :CurDepth(-1), Depth(0), BitRoot(NULL){}
+	~BinaryTree()
+	{
+		for (auto lptr = BitNodeArry.begin(); lptr != BitNodeArry.end(); ++lptr)
+		{
+			if (*lptr != NULL)
+			{
+				delete *lptr;
+				*lptr = NULL;
+			}
+		}
+		BitNodeArry.clear();
+	}
+public:
+	BinaryRoot			 BitRoot;
+private:
+	BinaryNode*					 NewNode;
+	static BinaryTree*			 BitTree;
+	vector<BinaryNode>BitNodeArry;
+public:
+
+	void   RecurPrint(BinaryRoot node, TraType type);
+	void   InsertBitNode(int data);
+	void   SearchBitNode(int data);
+private:
+	void   RecurSearchNode(BinaryNode* setnode);
+public:
+	static BinaryTree* GetTreeInstance()
+	{
+		//生成单例类
+		if (BitTree == NULL)
+		{
+			BitTree					= new BinaryTree();
+			static RecycleMem m_Recycle;
+			return BitTree;
+		}
+		return BitTree;
+	}
+private:
+	class RecycleMem{
+	public:
+		~RecycleMem()
+		{
+			if (BinaryTree::BitTree != NULL)
+			{
+				delete BinaryTree::BitTree;
+				BinaryTree::BitTree = NULL;
+			}
+			
+			return;
+		}
+	};
+};
+BinaryTree* BinaryTree::BitTree = NULL;
+
+/*-----------------
+*作用:寻找待添加叶节点
+*参数:根节点
+*返回值:空
+-----------------*/
+
+void BinaryTree::RecurSearchNode(BinaryNode* setnode)
+{
+	if (NewNode != NULL)
+	{
+		--CurDepth;
+		return;
+	}
+
+	if (*setnode != NULL)
+	++CurDepth;
+	
+
+	if (CurDepth == BitTree->Depth)
+	{
+		--CurDepth;
+		return;
+	}
+
+	if (*setnode == NULL && CurDepth < BitTree->Depth)
+	{
+		NewNode = setnode;
+		++CurDepth;
+		return;
+	}
+	RecurSearchNode(&((*setnode)->lchild));
+
+
+	RecurSearchNode(&((*setnode)->rchild));
+
+	--CurDepth;
+}
+
+/*-----------------
+*作用:插入叶结点
+*参数:数据
+*返回值:空
+-----------------*/
+
+void BinaryTree::InsertBitNode(int data)
+{
+	BinaryNode* lpcur = &BitRoot;
+	BinaryNode* RootPor = &BitRoot;
+	RecurSearchNode(RootPor);
+	if (NewNode == NULL)
+	{
+		while (*lpcur != NULL)
+		{
+			lpcur = &((*lpcur)->lchild);
+		}
+		*lpcur = new Tree();
+		(*lpcur)->data = data;
+		NewNode = lpcur;
+		++BitTree->Depth;
+	}
+	else
+	{
+		*NewNode = new TreeNode(); 
+		(*NewNode)->data = data;
+	}
+	BitNodeArry.push_back(*NewNode);
+
+	NewNode = NULL;
+	CurDepth = -1;
+}
+void BinaryTree::SearchBitNode(int data)
+{
+	BinaryNode cur = BitRoot;
+	
+}
+
+/*-----------------
+*作用:遍历二叉树
+*参数:1.根节点 2.遍历方式
+*返回值:空
+-----------------*/
+
+void  BinaryTree::RecurPrint(BinaryRoot node, TraType type = Preorder)
+{
+	if (node == NULL) return;
+	
+	if (type == Preorder)
+		printf(" data = %d\n", node->data);
+
+	RecurPrint(node->lchild , type);
+	
+	if (type == Inorder)
+		printf(" data = %d\n", node->data);
+
+	RecurPrint(node->rchild , type);
+
+	if (type == Postorder)
+		printf(" data = %d\n", node->data);
+
+	return;
+}
+
+int main()
+{
+	BinaryTree* Tree = BinaryTree::GetTreeInstance();
+	for (int i = 0; i < 10; ++i)
+	{
+		Tree->InsertBitNode(i);
+	}
+	printf("Depth = %d\n------------------------\n", Tree->Depth);
+
+	Tree->RecurPrint(Tree->BitRoot,Postorder);
+
+
+	system("pause");
+	return 0;
+}
