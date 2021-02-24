@@ -2,6 +2,7 @@
 #include<vector>
 using namespace std;
 
+/*枚举 遍历类型*/
 enum TraType{
 	Preorder,
 	Inorder,
@@ -154,8 +155,7 @@ void BinaryTree::InsertBitNode(int data)
 }
 void BinaryTree::SearchBitNode(int data)
 {
-	BinaryNode cur = BitRoot;
-	
+	BinaryNode cur = BitRoot;	
 }
 
 /*-----------------
@@ -193,7 +193,8 @@ int main()
 	}
 	printf("Depth = %d\n------------------------\n", Tree->Depth);
 
-	Tree->RecurPrint(Tree->BitRoot,Postorder);
+	Tree->RecurPrint(Tree->BitRoot,Postorder);		//前序遍历
+	Tree->RecurPrint(Tree->BitRoot,Inorder,)		//中序遍历
 
 
 	system("pause");

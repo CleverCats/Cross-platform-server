@@ -1,0 +1,68 @@
+#include<iostream>
+using namespace std;
+#define maxweight 99553
+
+void mintree_prim()
+{
+	int g_arc[9][9] = {
+								{0,	10, maxweight, maxweight, maxweight, 11, maxweight, maxweight, maxweight},
+								{10, 0, 18, maxweight, maxweight, maxweight, 16, maxweight,12},
+								{maxweight, 18, 0, 22, maxweight, maxweight, maxweight, maxweight,8},
+								{maxweight, maxweight, 22, 0, 20, maxweight, maxweight,16,21},
+								{maxweight, maxweight, maxweight, 20, 0, 26, maxweight, 7, maxweight },
+								{ 11, maxweight, maxweight, maxweight, 26, 0, 17, maxweight, maxweight },
+								{ maxweight, 16, maxweight, maxweight, maxweight, 17, 0, 19, maxweight },
+								{ maxweight, maxweight, maxweight, 16, 7, maxweight, 19, 0, maxweight },
+								{ maxweight, 12, 8, 21, maxweight, maxweight, maxweight, maxweight ,0}
+							};
+
+	int min, i, j, k;
+	int adjvex[9];
+	int lowcost[9];
+
+	adjvex[0] = 0;   //标记vertex0为0表示已访问 /*即0顶点开始访问*/
+	lowcost[0] = 0;  //自己不能指向自己所以权值为0
+
+	for (i = 1; i < 9; ++i) //初始化
+	{
+		lowcost[i]	= g_arc[0][i];  //记录 [0][1] - [0][8]的权值 /*0顶点可以通向的所有路段的权值*/
+		adjvex[i]	= 0;		    //初始化设置为0,后续
+
+	}
+	for (i = 1; i < 9; ++i)	//生成最小生成树
+	{
+		min = maxweight;    //最小权值设置为一个不可能的值,表示无法到达
+
+		j = 1; k = 0;
+		while (j < 9)		//筛选出权集中最小的权值min,j表示min代表的路径的终顶点在adjvex中的下标
+		{				    
+			if (lowcost[j] != 0 && lowcost[j] < min)  
+			{
+				min = lowcost[j];
+				k = j;
+			}
+			++j;
+		}
+		printf("(%d,%d)\n", adjvex[k], k);//打印当前最优路径 adjvex[k]顶点,
+		lowcost[k] = 0;					  //已访问过的带权路径置0,后续不会在访问adjvex[k]顶点
+
+		for (j = 1; j < 9; ++j)
+		{
+			if (lowcost[j] != 0 && g_arc[k][j] < lowcost[j]) 
+				/*lowcost中记录了上一个的顶点与其他所有顶点的权值 例如v0-1,v0-2 .....,v0-v8
+				此时这里会扫描下一个顶点与其他所有顶点的权值 例如v1-v2,v1-v3 ,....,v1-v8
+				并将源权值与对应位置的现权值比较,现较小权值的会覆盖掉源较大权值
+				【lowcost[j] != 0保证了不会访问重复顶点】*/
+			{
+				lowcost[j] = g_arc[k][j]; //替换权值
+				adjvex[j] = k;			  //获取该带权路径指向的终顶点adjvex中的下标
+			}
+		}
+		int a = 10;
+	}
+}
+int main()
+{
+	mintree_prim();
+	return 0;
+}
